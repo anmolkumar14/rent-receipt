@@ -1,0 +1,88 @@
+:root {
+  --bg: #0b0f17;
+  --card: #121a27;
+  --text: #e7eefc;
+  --muted: #a9b6d0;
+  --border: #22324b;
+  --primary: #4ea1ff;
+  --danger: #ff5c6c;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.container { max-width: 1100px; margin: 0 auto; padding: 16px; }
+.grid { display: grid; gap: 16px; grid-template-columns: 1fr; }
+@media (min-width: 900px) { .grid { grid-template-columns: 1.1fr 0.9fr; } }
+
+h1 { margin: 8px 0 0; font-size: 28px; }
+h2 { margin: 0 0 12px; font-size: 20px; }
+.muted { color: var(--muted); }
+.small { font-size: 13px; }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+}
+
+.form .row { display: grid; gap: 12px; grid-template-columns: 1fr; }
+@media (min-width: 650px) { .form .row { grid-template-columns: 1fr 1fr; } }
+
+.field { display: grid; gap: 6px; margin-bottom: 12px; }
+label { font-size: 13px; color: var(--muted); }
+input, select, textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #0e1522;
+  color: var(--text);
+  outline: none;
+}
+textarea { resize: vertical; }
+
+button {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #0e1522;
+  color: var(--text);
+  cursor: pointer;
+}
+button.primary {
+  background: var(--primary);
+  border-color: transparent;
+  color: #08111f;
+  font-weight: 700;
+}
+button.danger { border-color: transparent; background: var(--danger); color: #140408; font-weight: 700; }
+
+.actions { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+.fileLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #0e1522;
+  cursor: pointer;
+}
+
+.history { display: grid; gap: 10px; }
+.item {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+  background: #0e1522;
+}
+.itemTop { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.badge { font-size: 12px; padding: 4px 8px; border-radius: 999px; border: 1px solid var(--border); color: var(--muted); }
+.itemButtons { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }

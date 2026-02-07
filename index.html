@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rent Receipt Generator</title>
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- jsPDF (client-side PDF) -->
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+</head>
+<body>
+  <header class="container">
+    <h1>Rent Receipt Generator</h1>
+    <p class="muted">Generate PDF receipts + keep history on this device.</p>
+  </header>
+
+  <main class="container grid">
+    <section class="card">
+      <h2>Create Receipt</h2>
+
+      <form id="receiptForm" class="form">
+        <div class="row">
+          <div class="field">
+            <label>Tenant / Payer name</label>
+            <input id="tenantName" type="text" value="Anmol Ratan Kumar" required />
+          </div>
+          <div class="field">
+            <label>Landlord / Receiver name</label>
+            <input id="landlordName" type="text" value="Kanchan Rajiv Yadav" required />
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label>Receipt date</label>
+            <input id="receiptDate" type="date" required />
+          </div>
+		<div class="field">
+		  <label>Rent month (yyyy-mm-dd)</label>
+		  <input id="rentMonth" type="date" required />
+		</div>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label>Amount (₹)</label>
+            <input id="amount" type="number" min="0" step="1" value="15050" required />
+          </div>
+          <div class="field">
+            <label>Payment mode</label>
+            <select id="paymentMode" required>
+              <option value="Cash" selected>Cash</option>
+              <option value="UPI">UPI</option>
+              <option value="Bank Transfer">Bank Transfer</option>
+              <option value="Cheque">Cheque</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Property address (optional)</label>
+          <input id="propertyAddress" type="text" placeholder="Flat/House, Area, City" />
+        </div>
+		
+		<div class="row">
+		  <div class="field">
+			<label>Landlord PAN (optional)</label>
+			<input id="landlordPan" type="text" placeholder="ABCDExxxxX" />
+		  </div>
+		  <div class="field">
+			<label>Tenant PAN (optional)</label>
+			<input id="tenantPan" type="text" placeholder="ABCDExxxxX" />
+		  </div>
+		</div>		
+
+        <div class="field">
+          <label>Agreement / reference note (optional)</label>
+          <textarea id="agreementNote" rows="2"
+            placeholder="Example: Agreement confirmed on WhatsApp chat (screenshot kept)."></textarea>
+        </div>
+
+        <div class="row">
+          <button type="submit" class="primary">Generate PDF + Save</button>
+          <button type="button" id="clearFormBtn">Clear</button>
+        </div>
+
+        <p class="muted small">
+          Tip: For Feb 2026 rent, set <b>Rent month: 2026-02</b> and <b>Receipt date: 2026-02-01</b>.
+        </p>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>History</h2>
+      <div class="actions">
+        <button id="exportJsonBtn">Export History (JSON)</button>
+        <label class="fileLabel">
+          Import JSON
+          <input id="importJsonInput" type="file" accept="application/json" hidden />
+        </label>
+        <button id="clearHistoryBtn" class="danger">Clear History</button>
+      </div>
+
+      <div id="historyList" class="history"></div>
+      <p class="muted small">History is stored only on this device/browser.</p>
+    </section>
+  </main>
+
+  <footer class="container muted small">
+    Made for tracking rent receipts. Add signatures if you want extra clarity.
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
