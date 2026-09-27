@@ -137,6 +137,15 @@ label {
   font-size: 13px;
   font-weight: 500;
   color: #cbd5e1;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.required {
+  color: #ef4444;
+  font-weight: 700;
+  margin-left: 2px;
 }
 
 input, select, textarea {

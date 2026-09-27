@@ -94,27 +94,60 @@ function makeReceiptNumber(receipt) {
 }
 
 function buildReceiptObject() {
+  const tenantName = tenantNameEl.value.trim();
+  const landlordName = landlordNameEl.value.trim();
+  const receiptDate = receiptDateEl.value;
+  const rentMonth = rentMonthEl.value;
   const amount = Number(amountEl.value);
-  if (!Number.isFinite(amount) || amount < 0) throw new Error("Invalid amount.");
+  const paymentMode = paymentModeEl.value;
+  const propertyAddress = propertyAddressEl.value.trim();
+  const landlordPan = landlordPanEl.value.trim().toUpperCase();
+  const tenantPan = tenantPanEl.value.trim().toUpperCase();
+  const agreementNote = agreementNoteEl.value.trim();
+
+  if (!tenantName) {
+    throw new Error("Please enter Tenant / Payer name.");
+  }
+  if (!/^[A-Za-z\s\.\'\-]+$/.test(tenantName)) {
+    throw new Error("Tenant name should contain letters/characters only.");
+  }
+
+  if (!landlordName) {
+    throw new Error("Please enter Landlord / Receiver name.");
+  }
+  if (!/^[A-Za-z\s\.\'\-]+$/.test(landlordName)) {
+    throw new Error("Landlord name should contain letters/characters only.");
+  }
+
+  if (!receiptDate) {
+    throw new Error("Please select Receipt date.");
+  }
+  if (!rentMonth) {
+    throw new Error("Please select Rent month / period.");
+  }
+
+  if (!Number.isFinite(amount) || amount <= 0) {
+    throw new Error("Please enter a valid rent amount (greater than 0).");
+  }
+
+  if (!propertyAddress) {
+    throw new Error("Please enter Property address.");
+  }
 
   const receipt = {
     id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
     createdAt: new Date().toISOString(),
-    tenantName: tenantNameEl.value.trim(),
-    landlordName: landlordNameEl.value.trim(),
-    receiptDate: receiptDateEl.value,
-    rentMonth: rentMonthEl.value,
+    tenantName,
+    landlordName,
+    receiptDate,
+    rentMonth,
     amount,
-    paymentMode: paymentModeEl.value,
-    propertyAddress: propertyAddressEl.value.trim(),
-    landlordPan: landlordPanEl.value.trim().toUpperCase(),
-    tenantPan: tenantPanEl.value.trim().toUpperCase(),
-    agreementNote: agreementNoteEl.value.trim(),
+    paymentMode,
+    propertyAddress,
+    landlordPan,
+    tenantPan,
+    agreementNote,
   };
-
-  if (!receipt.tenantName || !receipt.landlordName || !receipt.receiptDate || !receipt.rentMonth) {
-    throw new Error("Please fill in all required fields.");
-  }
 
   receipt.receiptNo = makeReceiptNumber(receipt);
   return receipt;
@@ -356,8 +389,16 @@ form.addEventListener("submit", async (e) => {
 });
 
 clearFormBtn.addEventListener("click", () => {
-  agreementNoteEl.value = "";
+  tenantNameEl.value = "";
+  landlordNameEl.value = "";
   propertyAddressEl.value = "";
+  amountEl.value = "";
+  landlordPanEl.value = "";
+  tenantPanEl.value = "";
+  agreementNoteEl.value = "";
+  receiptDateEl.value = todayISO();
+  rentMonthEl.value = firstDayOfMonthISO();
+  paymentModeEl.value = "Cash";
 });
 
 clearHistoryBtn.addEventListener("click", () => {
@@ -409,8 +450,13 @@ importJsonInput.addEventListener("change", async (e) => {
 (function init() {
   receiptDateEl.value = todayISO();
   rentMonthEl.value = firstDayOfMonthISO();
-  propertyAddressEl.value = "Flat No:7, Lane no:-11, Sai Shraddha, Sai Nagari, Chandan Nagar, Pune - 411014 (MH)";
-  landlordPanEl.value = "ABJPY0535E";
+  tenantNameEl.value = "";
+  landlordNameEl.value = "";
+  propertyAddressEl.value = "";
+  landlordPanEl.value = "";
+  tenantPanEl.value = "";
+  amountEl.value = "";
+  agreementNoteEl.value = "";
 
   setupCalendarButtons();
   renderHistory();

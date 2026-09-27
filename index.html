@@ -34,18 +34,32 @@
       <form id="receiptForm" class="form">
         <div class="row">
           <div class="field">
-            <label for="tenantName">Tenant / Payer name</label>
-            <input id="tenantName" type="text" value="Anmol Ratan Kumar" required placeholder="Enter tenant name" />
+            <label for="tenantName">Tenant / Payer name <span class="required">*</span></label>
+            <input 
+              id="tenantName" 
+              type="text" 
+              required 
+              placeholder="e.g. John Doe" 
+              pattern="^[A-Za-z\s\.\'\-]+$" 
+              title="Please enter a valid name using letters/characters only" 
+            />
           </div>
           <div class="field">
-            <label for="landlordName">Landlord / Receiver name</label>
-            <input id="landlordName" type="text" value="Kanchan Rajiv Yadav" required placeholder="Enter landlord name" />
+            <label for="landlordName">Landlord / Receiver name <span class="required">*</span></label>
+            <input 
+              id="landlordName" 
+              type="text" 
+              required 
+              placeholder="e.g. Jane Smith" 
+              pattern="^[A-Za-z\s\.\'\-]+$" 
+              title="Please enter a valid name using letters/characters only" 
+            />
           </div>
         </div>
 
         <div class="row">
           <div class="field">
-            <label for="receiptDate">Receipt date</label>
+            <label for="receiptDate">Receipt date <span class="required">*</span></label>
             <div class="date-input-wrapper">
               <input id="receiptDate" type="date" required />
               <button type="button" class="calendar-btn" aria-label="Open receipt date picker">
@@ -59,7 +73,7 @@
             </div>
           </div>
           <div class="field">
-            <label for="rentMonth">Rent month / period</label>
+            <label for="rentMonth">Rent month / period <span class="required">*</span></label>
             <div class="date-input-wrapper">
               <input id="rentMonth" type="date" required />
               <button type="button" class="calendar-btn" aria-label="Open rent month picker">
@@ -76,11 +90,11 @@
 
         <div class="row">
           <div class="field">
-            <label for="amount">Amount (₹)</label>
-            <input id="amount" type="number" min="0" step="1" value="15050" required placeholder="Rent amount" />
+            <label for="amount">Amount (₹) <span class="required">*</span></label>
+            <input id="amount" type="number" min="1" step="1" required placeholder="e.g. 15000" />
           </div>
           <div class="field">
-            <label for="paymentMode">Payment mode</label>
+            <label for="paymentMode">Payment mode <span class="required">*</span></label>
             <select id="paymentMode" required>
               <option value="Cash" selected>Cash</option>
               <option value="UPI">UPI</option>
@@ -91,18 +105,18 @@
         </div>
 
         <div class="field">
-          <label for="propertyAddress">Property address (optional)</label>
-          <input id="propertyAddress" type="text" placeholder="Flat/House, Area, City" />
+          <label for="propertyAddress">Property address <span class="required">*</span></label>
+          <input id="propertyAddress" type="text" required placeholder="Flat/House No, Area/Colony, City - Pincode" />
         </div>
 		
         <div class="row">
           <div class="field">
             <label for="landlordPan">Landlord PAN (optional)</label>
-            <input id="landlordPan" type="text" placeholder="ABCDExxxxX" />
+            <input id="landlordPan" type="text" placeholder="ABCDE1234F" pattern="^[A-Za-z0-9]{10}$" title="10-character PAN number" />
           </div>
           <div class="field">
             <label for="tenantPan">Tenant PAN (optional)</label>
-            <input id="tenantPan" type="text" placeholder="ABCDExxxxX" />
+            <input id="tenantPan" type="text" placeholder="ABCDE1234F" pattern="^[A-Za-z0-9]{10}$" title="10-character PAN number" />
           </div>
         </div>		
 
@@ -125,7 +139,7 @@
         </div>
 
         <p class="muted small hint-text">
-          💡 Tap the calendar icon or input box to easily select receipt dates and rent periods on mobile & desktop.
+          💡 Fields with <span class="required">*</span> are mandatory. Names must contain letters only.
         </p>
       </form>
     </section>
