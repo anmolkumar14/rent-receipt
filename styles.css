@@ -400,7 +400,25 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   padding-bottom: 32px;
 }
 
+.credit-tag {
+  margin-top: 12px;
+  display: inline-block;
+  padding: 6px 16px;
+  border-radius: 999px;
+  background: rgba(59, 130, 246, 0.08);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  color: #93c5fd;
+  font-size: 13px;
+  letter-spacing: 0.01em;
+}
+
+.credit-tag strong {
+  color: #ffffff;
+  font-weight: 600;
+}
+
 .footer-note {
   margin-top: 14px;
   margin-bottom: 0;
 }
+

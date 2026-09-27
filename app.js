@@ -192,6 +192,11 @@ function generatePdfBlob(receipt) {
   doc.setTextColor(120);
   doc.text("Note: This receipt is generated for record keeping. Keep WhatsApp chat/screenshot as supporting agreement.", left, y);
 
+  y += 14;
+  doc.setFontSize(8);
+  doc.setTextColor(150);
+  doc.text("Created & Developed by Anmol RK Digital Lab", left, y);
+
   return doc.output("blob");
 }
 
