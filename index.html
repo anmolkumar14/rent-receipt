@@ -2,8 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="theme-color" content="#0b0f17" />
   <title>Rent Receipt Generator</title>
+  
+  <!-- Modern Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="styles.css" />
 
   <!-- jsPDF (client-side PDF) -->
@@ -11,44 +18,69 @@
 </head>
 <body>
   <header class="container">
-    <h1>Rent Receipt Generator</h1>
-    <p class="muted">Generate PDF receipts + keep history on this device.</p>
+    <div class="header-content">
+      <div class="brand-badge">🧾 Rent Manager</div>
+      <h1>Rent Receipt Generator</h1>
+      <p class="muted">Generate professional PDF receipts & keep instant history on this device.</p>
+    </div>
   </header>
 
   <main class="container grid">
     <section class="card">
-      <h2>Create Receipt</h2>
+      <div class="card-header">
+        <h2>Create Receipt</h2>
+      </div>
 
       <form id="receiptForm" class="form">
         <div class="row">
           <div class="field">
-            <label>Tenant / Payer name</label>
-            <input id="tenantName" type="text" value="Anmol Ratan Kumar" required />
+            <label for="tenantName">Tenant / Payer name</label>
+            <input id="tenantName" type="text" value="Anmol Ratan Kumar" required placeholder="Enter tenant name" />
           </div>
           <div class="field">
-            <label>Landlord / Receiver name</label>
-            <input id="landlordName" type="text" value="Kanchan Rajiv Yadav" required />
+            <label for="landlordName">Landlord / Receiver name</label>
+            <input id="landlordName" type="text" value="Kanchan Rajiv Yadav" required placeholder="Enter landlord name" />
           </div>
         </div>
 
         <div class="row">
           <div class="field">
-            <label>Receipt date</label>
-            <input id="receiptDate" type="date" required />
+            <label for="receiptDate">Receipt date</label>
+            <div class="date-input-wrapper">
+              <input id="receiptDate" type="date" required />
+              <button type="button" class="calendar-btn" aria-label="Open receipt date picker">
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+              </button>
+            </div>
           </div>
-		<div class="field">
-		  <label>Rent month (yyyy-mm-dd)</label>
-		  <input id="rentMonth" type="date" required />
-		</div>
+          <div class="field">
+            <label for="rentMonth">Rent month / period</label>
+            <div class="date-input-wrapper">
+              <input id="rentMonth" type="date" required />
+              <button type="button" class="calendar-btn" aria-label="Open rent month picker">
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+              </button>
+            </div>
+          </div>
         </div>
 
         <div class="row">
           <div class="field">
-            <label>Amount (₹)</label>
-            <input id="amount" type="number" min="0" step="1" value="15050" required />
+            <label for="amount">Amount (₹)</label>
+            <input id="amount" type="number" min="0" step="1" value="15050" required placeholder="Rent amount" />
           </div>
           <div class="field">
-            <label>Payment mode</label>
+            <label for="paymentMode">Payment mode</label>
             <select id="paymentMode" required>
               <option value="Cash" selected>Cash</option>
               <option value="UPI">UPI</option>
@@ -59,55 +91,64 @@
         </div>
 
         <div class="field">
-          <label>Property address (optional)</label>
+          <label for="propertyAddress">Property address (optional)</label>
           <input id="propertyAddress" type="text" placeholder="Flat/House, Area, City" />
         </div>
 		
-		<div class="row">
-		  <div class="field">
-			<label>Landlord PAN (optional)</label>
-			<input id="landlordPan" type="text" placeholder="ABCDExxxxX" />
-		  </div>
-		  <div class="field">
-			<label>Tenant PAN (optional)</label>
-			<input id="tenantPan" type="text" placeholder="ABCDExxxxX" />
-		  </div>
-		</div>		
+        <div class="row">
+          <div class="field">
+            <label for="landlordPan">Landlord PAN (optional)</label>
+            <input id="landlordPan" type="text" placeholder="ABCDExxxxX" />
+          </div>
+          <div class="field">
+            <label for="tenantPan">Tenant PAN (optional)</label>
+            <input id="tenantPan" type="text" placeholder="ABCDExxxxX" />
+          </div>
+        </div>		
 
         <div class="field">
-          <label>Agreement / reference note (optional)</label>
+          <label for="agreementNote">Agreement / reference note (optional)</label>
           <textarea id="agreementNote" rows="2"
             placeholder="Example: Agreement confirmed on WhatsApp chat (screenshot kept)."></textarea>
         </div>
 
-        <div class="row">
-          <button type="submit" class="primary">Generate PDF + Save</button>
-          <button type="button" id="clearFormBtn">Clear</button>
+        <div class="form-actions">
+          <button type="submit" class="btn primary-btn">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Generate PDF + Save
+          </button>
+          <button type="button" id="clearFormBtn" class="btn secondary-btn">Clear</button>
         </div>
 
-        <p class="muted small">
-          Tip: For Feb 2026 rent, set <b>Rent month: 2026-02</b> and <b>Receipt date: 2026-02-01</b>.
+        <p class="muted small hint-text">
+          💡 Tap the calendar icon or input box to easily select receipt dates and rent periods on mobile & desktop.
         </p>
       </form>
     </section>
 
     <section class="card">
-      <h2>History</h2>
+      <div class="card-header history-header">
+        <h2>Receipt History</h2>
+      </div>
       <div class="actions">
-        <button id="exportJsonBtn">Export History (JSON)</button>
-        <label class="fileLabel">
+        <button id="exportJsonBtn" class="btn small-btn">Export (JSON)</button>
+        <label class="fileLabel btn small-btn">
           Import JSON
           <input id="importJsonInput" type="file" accept="application/json" hidden />
         </label>
-        <button id="clearHistoryBtn" class="danger">Clear History</button>
+        <button id="clearHistoryBtn" class="btn danger-btn small-btn">Clear History</button>
       </div>
 
       <div id="historyList" class="history"></div>
-      <p class="muted small">History is stored only on this device/browser.</p>
+      <p class="muted small footer-note">History is stored privately on this device/browser.</p>
     </section>
   </main>
 
-  <footer class="container muted small">
+  <footer class="container footer-section muted small">
     Made for tracking rent receipts. Add signatures if you want extra clarity.
   </footer>
 

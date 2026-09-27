@@ -22,12 +22,21 @@ const tenantPanEl = document.getElementById("tenantPan");
 function todayISO() {
   const d = new Date();
   const pad = (n) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
+function firstDayOfMonthISO() {
+  const d = new Date();
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-01`;
 }
 
 function getReceipts() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); }
-  catch { return []; }
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+  } catch {
+    return [];
+  }
 }
 
 function setReceipts(list) {
@@ -36,18 +45,35 @@ function setReceipts(list) {
 
 function formatINR(n) {
   try {
-    return new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(n);
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: 0
+    }).format(n);
   } catch {
     return `₹${n}`;
   }
 }
 
 function monthLabel(dateStr) {
-  // yyyy-mm-dd -> "01 February 2026"
+  if (!dateStr) return "";
+  const parts = dateStr.split("-");
+  if (parts.length >= 2) {
+    const year = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10) - 1;
+    const day = parts[2] ? parseInt(parts[2], 10) : 1;
+    const d = new Date(year, month, day);
+    if (!isNaN(d.getTime())) {
+      return d.toLocaleDateString("en-IN", {
+        day: parts[2] ? "2-digit" : undefined,
+        month: "long",
+        year: "numeric"
+      });
+    }
+  }
+
   const d = new Date(dateStr);
-
-  if (isNaN(d)) return dateStr; // fallback safety
-
+  if (isNaN(d.getTime())) return dateStr;
   return d.toLocaleDateString("en-IN", {
     day: "2-digit",
     month: "long",
@@ -60,12 +86,11 @@ function rentPeriodLabel(dateStr) {
 }
 
 function makeReceiptNumber(receipt) {
-  // deterministic-ish: RR-YYYYMM-XXXX
-  const base = `${receipt.rentMonth.replace("-", "")}-${receipt.amount}-${receipt.tenantName}-${receipt.landlordName}`;
+  const base = `${receipt.rentMonth.replace(/-/g, "")}-${receipt.amount}-${receipt.tenantName}-${receipt.landlordName}`;
   let hash = 0;
   for (let i = 0; i < base.length; i++) hash = ((hash << 5) - hash) + base.charCodeAt(i);
   hash = Math.abs(hash) % 10000;
-  return `RR-${receipt.rentMonth.replaceAll("-", "")}-${String(hash).padStart(4, "0")}`;
+  return `RR-${receipt.rentMonth.replace(/-/g, "")}-${String(hash).padStart(4, "0")}`;
 }
 
 function buildReceiptObject() {
@@ -78,17 +103,17 @@ function buildReceiptObject() {
     tenantName: tenantNameEl.value.trim(),
     landlordName: landlordNameEl.value.trim(),
     receiptDate: receiptDateEl.value,
-    rentMonth: rentMonthEl.value, // yyyy-MM
+    rentMonth: rentMonthEl.value,
     amount,
     paymentMode: paymentModeEl.value,
     propertyAddress: propertyAddressEl.value.trim(),
-	landlordPan: landlordPanEl.value.trim().toUpperCase(),
+    landlordPan: landlordPanEl.value.trim().toUpperCase(),
     tenantPan: tenantPanEl.value.trim().toUpperCase(),
     agreementNote: agreementNoteEl.value.trim(),
   };
 
   if (!receipt.tenantName || !receipt.landlordName || !receipt.receiptDate || !receipt.rentMonth) {
-    throw new Error("Please fill required fields.");
+    throw new Error("Please fill in all required fields.");
   }
 
   receipt.receiptNo = makeReceiptNumber(receipt);
@@ -124,23 +149,23 @@ function generatePdfBlob(receipt) {
   doc.text(`Received by: ${receipt.landlordName}`, left, y);
   
   if (receipt.landlordPan) {
-  y += 18;
-  doc.text(`Landlord PAN: ${receipt.landlordPan}`, left, y);
+    y += 18;
+    doc.text(`Landlord PAN: ${receipt.landlordPan}`, left, y);
   }
   if (receipt.tenantPan) {
-  y += 18;
-  doc.text(`Tenant PAN: ${receipt.tenantPan}`, left, y);
+    y += 18;
+    doc.text(`Tenant PAN: ${receipt.tenantPan}`, left, y);
   }
 
   y += 18;
   doc.text(`Rent period: ${monthLabel(receipt.rentMonth)}`, left, y);
 
   y += 18;
-  doc.text(`Received rent of ${formatINR(receipt.amount)} by ${receipt.paymentMode} for rent period starting ${rentPeriodLabel(receipt.rentMonth)}.`,
-  left,
-  y
-);
-
+  doc.text(
+    `Received rent of ${formatINR(receipt.amount)} by ${receipt.paymentMode} for rent period starting ${rentPeriodLabel(receipt.rentMonth)}.`,
+    left,
+    y
+  );
 
   if (receipt.propertyAddress) {
     y += 18;
@@ -167,8 +192,7 @@ function generatePdfBlob(receipt) {
   doc.setTextColor(120);
   doc.text("Note: This receipt is generated for record keeping. Keep WhatsApp chat/screenshot as supporting agreement.", left, y);
 
-  const blob = doc.output("blob");
-  return blob;
+  return doc.output("blob");
 }
 
 async function downloadPdf(receipt) {
@@ -197,7 +221,6 @@ async function sharePdf(receipt) {
       files: [file],
     });
   } else {
-    // Fallback: download
     await downloadPdf(receipt);
     alert("Sharing not supported on this browser. PDF downloaded instead.");
   }
@@ -208,7 +231,7 @@ function renderHistory() {
     .sort((a, b) => (b.receiptDate || "").localeCompare(a.receiptDate || ""));
 
   if (list.length === 0) {
-    historyList.innerHTML = `<div class="muted">No receipts yet.</div>`;
+    historyList.innerHTML = `<div class="muted" style="padding: 16px 0; text-align: center;">No receipts saved yet. Generated receipts will show here.</div>`;
     return;
   }
 
@@ -219,24 +242,72 @@ function renderHistory() {
     div.innerHTML = `
       <div class="itemTop">
         <div>
-          <div><b>${monthLabel(r.rentMonth)}</b> <span class="badge">${r.paymentMode}</span></div>
+          <div class="itemTitle">
+            <span>${monthLabel(r.rentMonth)}</span> 
+            <span class="badge">${r.paymentMode}</span>
+          </div>
           <div class="muted small">${r.receiptNo} • Date: ${r.receiptDate}</div>
-          <div class="small">From <b>${r.tenantName}</b> to <b>${r.landlordName}</b></div>
+          <div class="small" style="margin-top: 4px;">From <b>${r.tenantName}</b> to <b>${r.landlordName}</b></div>
         </div>
-        <div style="text-align:right">
-          <div><b>${formatINR(r.amount)}</b></div>
+        <div style="text-align: right;">
+          <div class="itemAmount">${formatINR(r.amount)}</div>
           <div class="muted small">${r.propertyAddress ? r.propertyAddress : ""}</div>
         </div>
       </div>
 
       <div class="itemButtons">
-        <button data-action="download" data-id="${r.id}">Download PDF</button>
-        <button data-action="share" data-id="${r.id}" class="primary">Share</button>
-        <button data-action="delete" data-id="${r.id}" class="danger">Delete</button>
+        <button class="btn small-btn" data-action="download" data-id="${r.id}">
+          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          Download PDF
+        </button>
+        <button class="btn primary-btn small-btn" data-action="share" data-id="${r.id}">
+          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+          Share
+        </button>
+        <button class="btn danger-btn small-btn" data-action="delete" data-id="${r.id}">
+          Delete
+        </button>
       </div>
     `;
     historyList.appendChild(div);
   }
+}
+
+// Setup Calendar button click handlers
+function setupCalendarButtons() {
+  document.querySelectorAll(".date-input-wrapper").forEach((wrapper) => {
+    const input = wrapper.querySelector("input[type='date']");
+    const btn = wrapper.querySelector(".calendar-btn");
+
+    const openPicker = () => {
+      try {
+        if (typeof input.showPicker === "function") {
+          input.showPicker();
+        } else {
+          input.focus();
+        }
+      } catch {
+        input.focus();
+      }
+    };
+
+    if (btn) {
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        openPicker();
+      });
+    }
+
+    // Tapping the input itself opens picker comfortably
+    input.addEventListener("click", () => {
+      try {
+        if (typeof input.showPicker === "function") {
+          input.showPicker();
+        }
+      } catch {}
+    });
+  });
 }
 
 historyList.addEventListener("click", async (e) => {
@@ -270,7 +341,7 @@ form.addEventListener("submit", async (e) => {
     list.push(receipt);
     setReceipts(list);
 
-    // Download immediately (and keep in history)
+    // Download immediately
     await downloadPdf(receipt);
 
     renderHistory();
@@ -313,7 +384,6 @@ importJsonInput.addEventListener("change", async (e) => {
     const incoming = JSON.parse(text);
     if (!Array.isArray(incoming)) throw new Error("Invalid JSON format.");
 
-    // Merge (avoid exact duplicates by receiptNo)
     const existing = getReceipts();
     const existingNos = new Set(existing.map(x => x.receiptNo));
     const merged = [...existing];
@@ -330,15 +400,13 @@ importJsonInput.addEventListener("change", async (e) => {
   }
 });
 
-// Defaults: set today date; set rent month to current month
+// Initialization
 (function init() {
   receiptDateEl.value = todayISO();
-
-  const d = new Date();
-  const pad = (n) => String(n).padStart(2, "0");
-  rentMonthEl.value = `${d.getFullYear()}-${pad(d.getMonth()+1)}`;
+  rentMonthEl.value = firstDayOfMonthISO();
   propertyAddressEl.value = "Flat No:7, Lane no:-11, Sai Shraddha, Sai Nagari, Chandan Nagar, Pune - 411014 (MH)";
   landlordPanEl.value = "ABJPY0535E";
 
+  setupCalendarButtons();
   renderHistory();
 })();
